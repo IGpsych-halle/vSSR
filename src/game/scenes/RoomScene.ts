@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import floorWood from "../../assets/tilesets/vSSR_holzdielen.png"
+import tableSprite from "../../assets/furniture/table.png";
 
 export class RoomScene extends Phaser.Scene {
   private player!: Phaser.Physics.Arcade.Sprite;
@@ -20,17 +21,20 @@ export class RoomScene extends Phaser.Scene {
 
   preload() {
   this.load.image("floor", floorWood);
+  this.load.image("table", tableSprite);
   }
 
   create() {
-
-    this.add.tileSprite(
+    
+    const floor =this.add.tileSprite(
         1200,
         800,
         2400,
         1600,
         "floor"
     );
+
+    floor.setDepth(0);
 
     this.add.text(40, 40, "vSSR Room", {
       fontSize: "32px",
@@ -54,6 +58,7 @@ export class RoomScene extends Phaser.Scene {
     tableGraphics.destroy();
 
     this.player = this.physics.add.sprite(1200, 1000, "player");
+    this.player.setDepth(30);
 
     const playerBody = this.player.body as Phaser.Physics.Arcade.Body;
 
@@ -66,14 +71,20 @@ export class RoomScene extends Phaser.Scene {
     // Player innerhalb der Welt halten
     this.player.setCollideWorldBounds(true);
 
-    // Kamera auf dieselbe Welt begrenzen
     this.cameras.main.setBounds(0, 0, 2400, 1600);
 
-    // Kamera folgt dem Player
-    this.cameras.main.startFollow(this.player, true, 1, 1);
+    this.cameras.main.setRoundPixels(true);
+    this.cameras.main.setZoom(1);
 
     // Test-Tisch
     this.table = this.physics.add.staticImage(1200, 800, "table");
+
+    const tableBody = this.table.body as Phaser.Physics.Arcade.StaticBody;
+
+    tableBody.setSize(170, 80);
+    tableBody.setOffset(35, 50);
+
+    this.table.setDepth(this.table.y);
 
     // Kollision Player ↔ Tisch
     this.physics.add.collider(this.player, this.table);
@@ -123,5 +134,17 @@ export class RoomScene extends Phaser.Scene {
     } else {
       this.player.setVelocity(0, 0);
     }
+
+    const camera = this.cameras.main;
+
+    camera.scrollX = Math.round(
+    this.player.x - camera.width / 2
+    );
+
+    camera.scrollY = Math.round(
+    this.player.y - camera.height / 2
+    );
+
+    this.player.setDepth(this.player.y);
   }
 }

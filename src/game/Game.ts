@@ -8,7 +8,8 @@ export function startGame(parent: string) {
     height: 540,
     parent,
     backgroundColor: "#1e1e2f",
-    pixelArt: true,
+    pixelArt: false,
+    antialias: true,
     physics: {
         default: "arcade",
         arcade: {
