@@ -3,6 +3,8 @@ import floorWood from "../../assets/tilesets/vSSR_holzdielen.png"
 import tableSprite from "../../assets/furniture/table.png";
 import wallTop from "../../assets/tilesets/vSSR_wand_oben.png";
 
+import noticeboardSprite from "../../assets/interactives/noticeboard.png";
+
 import playerFront from "../../assets/avatar/avatar_base_front.png";
 import playerBack from "../../assets/avatar/avatar_base_back.png";
 import playerLeft from "../../assets/avatar/avatar_base_left.png";
@@ -33,6 +35,7 @@ export class RoomScene extends Phaser.Scene {
   this.load.image("floor", floorWood);
   this.load.image("table", tableSprite);
   this.load.image("wall-top", wallTop);
+  this.load.image("noticeboard", noticeboardSprite);
 
   this.load.image("player-front", playerFront);
   this.load.image("player-back", playerBack);
@@ -79,6 +82,14 @@ export class RoomScene extends Phaser.Scene {
     );
 
     this.physics.add.existing(wallCollider, true);
+
+    const noticeboard = this.add.image(
+      1060,
+      95,
+      "noticeboard"
+    );
+
+    noticeboard.setDepth(10);
 
     this.add.text(40, 40, "vSSR Room", {
       fontSize: "32px",
