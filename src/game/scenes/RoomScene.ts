@@ -11,11 +11,15 @@ import playerLeft from "../../assets/avatar/avatar_base_left.png";
 import playerRight from "../../assets/avatar/avatar_base_right.png";
 
 import playerFrontWalk from "../../assets/avatar/avatar_base_walk_front.png";
+import playerLeftWalk from "../../assets/avatar/avatar_base_walk_left.png";
+import playerRightWalk from "../../assets/avatar/avatar_base_walk_right.png";
+import playerBackWalk from "../../assets/avatar/avatar_base_walk_back.png";
 
 
 
 export class RoomScene extends Phaser.Scene {
   private player!: Phaser.Physics.Arcade.Sprite;
+  private facing: "front" | "back" | "left" | "right" = "front";
   private table!: Phaser.Physics.Arcade.Image;
 
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -46,46 +50,74 @@ export class RoomScene extends Phaser.Scene {
     "player-front-walk",
     playerFrontWalk,
     {
-      frameWidth: 81,
-      frameHeight: 107,
+      frameWidth: 32,
+      frameHeight: 42,
     }
   );
+
+  this.load.spritesheet(
+    "player-left-walk",
+    playerLeftWalk,
+    {
+      frameWidth: 32,
+      frameHeight: 42,
+    }
+  );
+
+  this.load.spritesheet(
+    "player-right-walk",
+    playerRightWalk,
+    {
+      frameWidth: 32,
+      frameHeight: 42,
+    }
+  );
+
+  this.load.spritesheet(
+    "player-back-walk",
+    playerBackWalk,
+    {
+      frameWidth: 32,
+      frameHeight: 42,
+    }
+  );
+
   }
 
   create() {
     
     const floor =this.add.tileSprite(
+        600,
+        400,
         1200,
         800,
-        2400,
-        1600,
         "floor"
     );
 
     floor.setDepth(0);
 
     const wall = this.add.tileSprite(
-      1200, // Mitte der 2400px breiten Welt
-      120,  // Mitte der 300px hohen Wand
-      2400,
-      254,
+      600, // Mitte der 2400px breiten Welt
+      60,  // Mitte der 300px hohen Wand
+      1200,
+      127,
       "wall-top"
     );
 
     wall.setDepth(5);
 
     const wallCollider = this.add.rectangle(
+      600,
+      115,
       1200,
-      230,
-      2400,
-      30
+      15
     );
 
     this.physics.add.existing(wallCollider, true);
 
     const noticeboard = this.add.image(
-      1060,
-      95,
+      545,
+      48,
       "noticeboard"
     );
 
@@ -96,43 +128,28 @@ export class RoomScene extends Phaser.Scene {
       color: "#ffffff",
     });
 
-    // Temporäre Player-Textur erzeugen
-    const playerGraphics = this.make.graphics({ x: 0, y: 0 });
-
-    playerGraphics.fillStyle(0xffffff);
-    playerGraphics.fillRect(0, 0, 32, 48);
-    playerGraphics.generateTexture("player", 32, 48);
-    playerGraphics.destroy();
-
-    // Temporäre Tisch-Textur erzeugen
-    const tableGraphics = this.make.graphics({ x: 0, y: 0 });
-
-    tableGraphics.fillStyle(0x8b5a2b);
-    tableGraphics.fillRect(0, 0, 160, 80);
-    tableGraphics.generateTexture("table", 160, 80);
-    tableGraphics.destroy();
-
-    this.player = this.physics.add.sprite(1200, 1000, "player-front");
+    this.player = this.physics.add.sprite(600, 500, "player-front");
     this.player.setDepth(30);
+    
 
     const playerBody = this.player.body as Phaser.Physics.Arcade.Body;
 
-    playerBody.setSize(40, 40);
-    playerBody.setOffset(20, 65);
+    playerBody.setSize(16, 10);
+    playerBody.setOffset(8, 30);
 
     // Weltgröße festlegen
-    this.physics.world.setBounds(0, 0, 2400, 1600);
+    this.physics.world.setBounds(0, 0, 1200, 800);
 
     // Player innerhalb der Welt halten
     this.player.setCollideWorldBounds(true);
 
-    this.cameras.main.setBounds(0, 0, 2400, 1600);
+    this.cameras.main.setBounds(0, 0, 1200, 800);
 
     this.cameras.main.setRoundPixels(true);
     this.cameras.main.setZoom(1);
 
     // Test-Tisch
-    this.table = this.physics.add.staticImage(1200, 800, "table");
+    this.table = this.physics.add.staticImage(600, 400, "table");
 
     const tableBody = this.table.body as Phaser.Physics.Arcade.StaticBody;
 
@@ -168,25 +185,49 @@ export class RoomScene extends Phaser.Scene {
       frameRate: 6.67,
       repeat: -1,
     });
+
+    this.anims.create({
+      key: "walk-back",
+      frames: this.anims.generateFrameNumbers("player-back-walk", {
+        frames: [1, 2, 3, 0],
+      }),
+      frameRate: 6.67,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "walk-left",
+      frames: this.anims.generateFrameNumbers("player-left-walk", {
+        frames: [1, 2, 3, 0],
+      }),
+      frameRate: 6.67,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "walk-right",
+      frames: this.anims.generateFrameNumbers("player-right-walk", {
+        frames: [1, 2, 3, 0],
+      }),
+      frameRate: 6.67,
+      repeat: -1,
+    });
   }
 
   update() {
-    const speed = 180;
+    const speed = 70;
 
     const direction = new Phaser.Math.Vector2(0, 0);
 
     if (this.cursors.left.isDown || this.wasd.A.isDown) {
-      this.player.setTexture("player-left");
       direction.x = -1;
     }
 
     if (this.cursors.right.isDown || this.wasd.D.isDown) {
-      this.player.setTexture("player-right");
       direction.x = 1;
     }
 
     if (this.cursors.up.isDown || this.wasd.W.isDown) {
-      this.player.setTexture("player-back");
       direction.y = -1;
     }
 
@@ -194,8 +235,21 @@ export class RoomScene extends Phaser.Scene {
       direction.y = 1;
     }
 
-    if (direction.y > 0) {
+    if (direction.x < 0) {
+      this.facing = "left";
+      this.player.play("walk-left", true);
+    }
+    else if (direction.x > 0) {
+      this.facing = "right";
+      this.player.play("walk-right", true);
+    }
+    else if (direction.y > 0) {
+      this.facing = "front";
       this.player.play("walk-front", true);
+    }
+    else if (direction.y < 0) {
+      this.facing = "back";
+      this.player.play("walk-back", true);
     }
 
     if (direction.length() > 0) {
@@ -205,24 +259,12 @@ export class RoomScene extends Phaser.Scene {
       this.player.setVelocity(direction.x, direction.y);
     } else {
       this.player.setVelocity(0, 0);
-
       this.player.stop();
 
-      // Wenn die Front-Animation aktiv war:
-      if (this.player.texture.key === "player-front-walk") {
-        this.player.setFrame(0);
-      }
+      this.player.setTexture(`player-${this.facing}`);
     }
 
-    const camera = this.cameras.main;
-
-    camera.scrollX = Math.round(
-    this.player.x - camera.width / 2
-    );
-
-    camera.scrollY = Math.round(
-    this.player.y - camera.height / 2
-    );
+    this.cameras.main.startFollow(this.player, true);
 
     const playerBody = this.player.body as Phaser.Physics.Arcade.Body;
     const playerFeetY = playerBody.bottom;

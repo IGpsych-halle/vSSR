@@ -4,18 +4,29 @@ import { RoomScene } from "./scenes/RoomScene";
 export function startGame(parent: string) {
   const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
-    width: 960,
-    height: 540,
-    parent,
+
+    width: 480,
+    height: 270,
+
+    parent: parent,
+
     backgroundColor: "#1e1e2f",
-    pixelArt: false,
-    antialias: true,
-    physics: {
-        default: "arcade",
-        arcade: {
-        debug: true,
-        },
+
+    pixelArt: true,
+    antialias: false,
+
+    scale: {
+      mode: Phaser.Scale.FIT,
+      autoCenter: Phaser.Scale.CENTER_BOTH,
     },
+
+    physics: {
+      default: "arcade",
+      arcade: {
+        debug: false,
+      },
+    },
+
     scene: [RoomScene],
   };
 
