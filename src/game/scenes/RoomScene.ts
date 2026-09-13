@@ -1,15 +1,23 @@
 import Phaser from "phaser";
+
+//tilesets
 import floorWood from "../../assets/tilesets/vSSR_holzdielen.png"
-import tableSprite from "../../assets/furniture/table.png";
 import wallTop from "../../assets/tilesets/vSSR_wand_oben.png";
 
+//furniture
+import tableSprite from "../../assets/furniture/table.png";
+import bookshelfNarrowSprite from "../../assets/furniture/bookshelf_narrow.png";
+
+//interactibles
 import noticeboardSprite from "../../assets/interactives/noticeboard.png";
 
+//player
 import playerFront from "../../assets/avatar/avatar_base_front.png";
 import playerBack from "../../assets/avatar/avatar_base_back.png";
 import playerLeft from "../../assets/avatar/avatar_base_left.png";
 import playerRight from "../../assets/avatar/avatar_base_right.png";
 
+//player-animations
 import playerFrontWalk from "../../assets/avatar/avatar_base_walk_front.png";
 import playerLeftWalk from "../../assets/avatar/avatar_base_walk_left.png";
 import playerRightWalk from "../../assets/avatar/avatar_base_walk_right.png";
@@ -21,6 +29,7 @@ export class RoomScene extends Phaser.Scene {
   private player!: Phaser.Physics.Arcade.Sprite;
   private facing: "front" | "back" | "left" | "right" = "front";
   private table!: Phaser.Physics.Arcade.Image;
+  private bookshelfNarrow!: Phaser.Physics.Arcade.Image;
 
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
 
@@ -37,9 +46,13 @@ export class RoomScene extends Phaser.Scene {
 
   preload() {
   this.load.image("floor", floorWood);
-  this.load.image("table", tableSprite);
   this.load.image("wall-top", wallTop);
+
+  this.load.image("table", tableSprite);
+  this.load.image("bookshelf-narrow", bookshelfNarrowSprite);
+
   this.load.image("noticeboard", noticeboardSprite);
+
 
   this.load.image("player-front", playerFront);
   this.load.image("player-back", playerBack);
@@ -117,25 +130,20 @@ export class RoomScene extends Phaser.Scene {
 
     const noticeboard = this.add.image(
       545,
-      48,
+      90,
       "noticeboard"
     );
 
     noticeboard.setDepth(10);
 
-    this.add.text(40, 40, "vSSR Room", {
-      fontSize: "32px",
-      color: "#ffffff",
-    });
-
     this.player = this.physics.add.sprite(600, 500, "player-front");
-    this.player.setDepth(30);
-    
 
     const playerBody = this.player.body as Phaser.Physics.Arcade.Body;
 
-    playerBody.setSize(16, 10);
-    playerBody.setOffset(8, 30);
+    this.player.setDepth(playerBody.bottom);
+
+    playerBody.setSize(16, 8);
+    playerBody.setOffset(9, 34);
 
     // Weltgröße festlegen
     this.physics.world.setBounds(0, 0, 1200, 800);
@@ -148,7 +156,7 @@ export class RoomScene extends Phaser.Scene {
     this.cameras.main.setRoundPixels(true);
     this.cameras.main.setZoom(1);
 
-    // Test-Tisch
+    // Furniture
     this.table = this.physics.add.staticImage(600, 400, "table");
 
     const tableBody = this.table.body as Phaser.Physics.Arcade.StaticBody;
@@ -158,8 +166,18 @@ export class RoomScene extends Phaser.Scene {
 
     this.table.setDepth(this.table.y);
 
+    this.bookshelfNarrow = this.physics.add.staticImage(1000, 400, "bookshelf-narrow");
+
+    const bookshelfNarrowBody = this.bookshelfNarrow.body as Phaser.Physics.Arcade.StaticBody;
+
+    bookshelfNarrowBody.setSize(40, 30);
+    bookshelfNarrowBody.setOffset(6, 62);
+
+    this.bookshelfNarrow.setDepth(this.bookshelfNarrow.y + 30);
+
     // Kollision Player
     this.physics.add.collider(this.player, this.table);
+    this.physics.add.collider(this.player, this.bookshelfNarrow);
     this.physics.add.collider(this.player, wallCollider);
 
     // Tastatursteuerung
@@ -215,7 +233,7 @@ export class RoomScene extends Phaser.Scene {
   }
 
   update() {
-    const speed = 70;
+    const speed = 90;
 
     const direction = new Phaser.Math.Vector2(0, 0);
 
@@ -267,14 +285,8 @@ export class RoomScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player, true);
 
     const playerBody = this.player.body as Phaser.Physics.Arcade.Body;
-    const playerFeetY = playerBody.bottom;
 
-    const depthLineY = this.table.y;
+    this.player.setDepth(playerBody.bottom);
 
-    if (playerFeetY < depthLineY) {
-      this.player.setDepth(this.table.depth - 1);
-    } else {
-      this.player.setDepth(this.table.depth + 1);
-    }
   }
 }
