@@ -1,35 +1,29 @@
 import Phaser from "phaser";
 
-//tilesets
-import floorWood from "../../assets/tilesets/vSSR_holzdielen.png"
-import wallTop from "../../assets/tilesets/vSSR_wand_oben.png";
+import { loadHubAssets } from "../../assets/loadHubAssets";
+import { loadPlayerAssets } from "../player/loadPlayerAssets";
 
-//furniture
-import tableSprite from "../../assets/furniture/table.png";
-import bookshelfNarrowSprite from "../../assets/furniture/bookshelf_narrow.png";
+//room-config
+import {
+  ROOM_WIDTH,
+  ROOM_HEIGHT,
+  PLAYER_SPEED,
+} from "../config/roomConfig";
 
-//interactibles
-import noticeboardSprite from "../../assets/interactives/noticeboard.png";
+//furniture-config
+import { createFurniture } from "../world/createFurniture";
 
-//player
-import playerFront from "../../assets/avatar/avatar_base_front.png";
-import playerBack from "../../assets/avatar/avatar_base_back.png";
-import playerLeft from "../../assets/avatar/avatar_base_left.png";
-import playerRight from "../../assets/avatar/avatar_base_right.png";
+//player-animations-config
+import { createPlayerAnimations } from "../player/playerAnimations";
 
-//player-animations
-import playerFrontWalk from "../../assets/avatar/avatar_base_walk_front.png";
-import playerLeftWalk from "../../assets/avatar/avatar_base_walk_left.png";
-import playerRightWalk from "../../assets/avatar/avatar_base_walk_right.png";
-import playerBackWalk from "../../assets/avatar/avatar_base_walk_back.png";
-
-
+import {
+  updatePlayerMovement,
+  type Facing,
+} from "../player/playerMovement";
 
 export class RoomScene extends Phaser.Scene {
   private player!: Phaser.Physics.Arcade.Sprite;
-  private facing: "front" | "back" | "left" | "right" = "front";
-  private table!: Phaser.Physics.Arcade.Image;
-  private bookshelfNarrow!: Phaser.Physics.Arcade.Image;
+  private facing: Facing = "front";
 
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
 
@@ -45,74 +39,50 @@ export class RoomScene extends Phaser.Scene {
   }
 
   preload() {
-  this.load.image("floor", floorWood);
-  this.load.image("wall-top", wallTop);
 
-  this.load.image("table", tableSprite);
-  this.load.image("bookshelf-narrow", bookshelfNarrowSprite);
-
-  this.load.image("noticeboard", noticeboardSprite);
-
-
-  this.load.image("player-front", playerFront);
-  this.load.image("player-back", playerBack);
-  this.load.image("player-left", playerLeft);
-  this.load.image("player-right", playerRight);
-
-  this.load.spritesheet(
-    "player-front-walk",
-    playerFrontWalk,
-    {
-      frameWidth: 32,
-      frameHeight: 42,
-    }
-  );
-
-  this.load.spritesheet(
-    "player-left-walk",
-    playerLeftWalk,
-    {
-      frameWidth: 32,
-      frameHeight: 42,
-    }
-  );
-
-  this.load.spritesheet(
-    "player-right-walk",
-    playerRightWalk,
-    {
-      frameWidth: 32,
-      frameHeight: 42,
-    }
-  );
-
-  this.load.spritesheet(
-    "player-back-walk",
-    playerBackWalk,
-    {
-      frameWidth: 32,
-      frameHeight: 42,
-    }
-  );
+  loadHubAssets(this);
+  loadPlayerAssets(this);
 
   }
 
   create() {
-    
+
+    const furnitureConfigs = [
+  {
+    texture: "table",
+    x: 600,
+    y: 400,
+    bodyWidth: 240,
+    bodyHeight: 70,
+    offsetX: 80,
+    offsetY: 95,
+  },
+  {
+    texture: "bookshelf-narrow",
+    x: 1000,
+    y: 400,
+    bodyWidth: 40,
+    bodyHeight: 30,
+    offsetX: 6,
+    offsetY: 62,
+    depthOffset: 30,
+  },
+];
+
     const floor =this.add.tileSprite(
-        600,
-        400,
-        1200,
-        800,
+        ROOM_WIDTH / 2,
+        ROOM_HEIGHT / 2,
+        ROOM_WIDTH,
+        ROOM_HEIGHT,
         "floor"
     );
 
     floor.setDepth(0);
 
     const wall = this.add.tileSprite(
-      600, // Mitte der 2400px breiten Welt
-      60,  // Mitte der 300px hohen Wand
-      1200,
+      ROOM_WIDTH / 2, 
+      60,
+      ROOM_WIDTH,
       127,
       "wall-top"
     );
@@ -120,9 +90,9 @@ export class RoomScene extends Phaser.Scene {
     wall.setDepth(5);
 
     const wallCollider = this.add.rectangle(
-      600,
+      ROOM_WIDTH / 2,
       115,
-      1200,
+      ROOM_WIDTH,
       15
     );
 
@@ -145,39 +115,19 @@ export class RoomScene extends Phaser.Scene {
     playerBody.setSize(16, 8);
     playerBody.setOffset(9, 34);
 
-    // Weltgröße festlegen
-    this.physics.world.setBounds(0, 0, 1200, 800);
-
     // Player innerhalb der Welt halten
     this.player.setCollideWorldBounds(true);
+    // Weltgröße festlegen
+    this.physics.world.setBounds(0, 0, ROOM_WIDTH, ROOM_HEIGHT);
 
-    this.cameras.main.setBounds(0, 0, 1200, 800);
+    this.cameras.main.setBounds(0, 0, ROOM_WIDTH, ROOM_HEIGHT);
 
     this.cameras.main.setRoundPixels(true);
     this.cameras.main.setZoom(1);
+    this.cameras.main.startFollow(this.player, true);
 
     // Furniture
-    this.table = this.physics.add.staticImage(600, 400, "table");
 
-    const tableBody = this.table.body as Phaser.Physics.Arcade.StaticBody;
-
-    tableBody.setSize(240, 70);
-    tableBody.setOffset(80, 95);
-
-    this.table.setDepth(this.table.y);
-
-    this.bookshelfNarrow = this.physics.add.staticImage(1000, 400, "bookshelf-narrow");
-
-    const bookshelfNarrowBody = this.bookshelfNarrow.body as Phaser.Physics.Arcade.StaticBody;
-
-    bookshelfNarrowBody.setSize(40, 30);
-    bookshelfNarrowBody.setOffset(6, 62);
-
-    this.bookshelfNarrow.setDepth(this.bookshelfNarrow.y + 30);
-
-    // Kollision Player
-    this.physics.add.collider(this.player, this.table);
-    this.physics.add.collider(this.player, this.bookshelfNarrow);
     this.physics.add.collider(this.player, wallCollider);
 
     // Tastatursteuerung
@@ -194,99 +144,33 @@ export class RoomScene extends Phaser.Scene {
       S: Phaser.Input.Keyboard.Key;
       D: Phaser.Input.Keyboard.Key;
     };
+
+    for (const config of furnitureConfigs) {
+      createFurniture(
+        this,
+        this.player,
+        config
+      );
+    }
     
-    this.anims.create({
-      key: "walk-front",
-      frames: this.anims.generateFrameNumbers("player-front-walk", {
-        frames: [1, 2, 3, 0],
-      }),
-      frameRate: 6.67,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "walk-back",
-      frames: this.anims.generateFrameNumbers("player-back-walk", {
-        frames: [1, 2, 3, 0],
-      }),
-      frameRate: 6.67,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "walk-left",
-      frames: this.anims.generateFrameNumbers("player-left-walk", {
-        frames: [1, 2, 3, 0],
-      }),
-      frameRate: 6.67,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: "walk-right",
-      frames: this.anims.generateFrameNumbers("player-right-walk", {
-        frames: [1, 2, 3, 0],
-      }),
-      frameRate: 6.67,
-      repeat: -1,
-    });
+    createPlayerAnimations(this);
   }
 
   update() {
-    const speed = 90;
 
-    const direction = new Phaser.Math.Vector2(0, 0);
+    this.facing = updatePlayerMovement(
+      this.player,
+      {
+        cursors: this.cursors,
+        wasd: this.wasd,
+      },
+      this.facing,
+      PLAYER_SPEED
+    );
 
-    if (this.cursors.left.isDown || this.wasd.A.isDown) {
-      direction.x = -1;
-    }
-
-    if (this.cursors.right.isDown || this.wasd.D.isDown) {
-      direction.x = 1;
-    }
-
-    if (this.cursors.up.isDown || this.wasd.W.isDown) {
-      direction.y = -1;
-    }
-
-    if (this.cursors.down.isDown || this.wasd.S.isDown) {
-      direction.y = 1;
-    }
-
-    if (direction.x < 0) {
-      this.facing = "left";
-      this.player.play("walk-left", true);
-    }
-    else if (direction.x > 0) {
-      this.facing = "right";
-      this.player.play("walk-right", true);
-    }
-    else if (direction.y > 0) {
-      this.facing = "front";
-      this.player.play("walk-front", true);
-    }
-    else if (direction.y < 0) {
-      this.facing = "back";
-      this.player.play("walk-back", true);
-    }
-
-    if (direction.length() > 0) {
-      direction.normalize();
-      direction.scale(speed);
-
-      this.player.setVelocity(direction.x, direction.y);
-    } else {
-      this.player.setVelocity(0, 0);
-      this.player.stop();
-
-      this.player.setTexture(`player-${this.facing}`);
-    }
-
-    this.cameras.main.startFollow(this.player, true);
-
-    const playerBody = this.player.body as Phaser.Physics.Arcade.Body;
+    const playerBody =
+      this.player.body as Phaser.Physics.Arcade.Body;
 
     this.player.setDepth(playerBody.bottom);
-
   }
 }
