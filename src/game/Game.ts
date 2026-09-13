@@ -23,7 +23,7 @@ export function startGame(parent: string) {
     physics: {
       default: "arcade",
       arcade: {
-        debug: true,
+        debug: false,
       },
     },
 

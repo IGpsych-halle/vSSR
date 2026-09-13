@@ -10,8 +10,12 @@ import {
   PLAYER_SPEED,
 } from "../config/roomConfig";
 
-//furniture-config
+import { hubTiles } from "../config/hubTiles";
+
+//import creator-files
 import { createFurniture } from "../world/createFurniture";
+import { createTileSprite } from "../world/createTileSprite";
+
 
 //player-animations-config
 import { createPlayerAnimations } from "../player/playerAnimations";
@@ -48,59 +52,64 @@ export class RoomScene extends Phaser.Scene {
   create() {
 
     const furnitureConfigs = [
-  {
-    texture: "table",
-    x: 600,
-    y: 400,
-    bodyWidth: 240,
-    bodyHeight: 70,
-    offsetX: 80,
-    offsetY: 95,
-  },
-  {
-    texture: "bookshelf-narrow",
-    x: 1000,
-    y: 400,
-    bodyWidth: 40,
-    bodyHeight: 30,
-    offsetX: 6,
-    offsetY: 62,
-    depthOffset: 30,
-  },
-];
+      {
+        texture: "table",
+        x: 530,
+        y: 150,
+        bodyWidth: 72,
+        bodyHeight: 25,
+        offsetX: 4,
+        offsetY: 20,
+        depthOffset: 2,
+      },
+      {
+        texture: "bookshelf-narrow",
+        x: 460,
+        y: 60,
+        bodyWidth: 40,
+        bodyHeight: 30,
+        offsetX: 6,
+        offsetY: 62,
+        depthOffset: 30,
+      },
+      {
+        texture: "chair",
+        x: 517,
+        y: 125,
+        bodyWidth: 10,
+        bodyHeight: 10,
+        offsetX: 16,
+        offsetY: 18,
+        depthOffset: 1,
+      },
+      {
+        texture: "chair",
+        x: 541,
+        y: 125,
+        bodyWidth: 10,
+        bodyHeight: 10,
+        offsetX: 16,
+        offsetY: 18,
+        depthOffset: 1,
+      },
+    ];
 
-    const floor =this.add.tileSprite(
-        ROOM_WIDTH / 2,
-        ROOM_HEIGHT / 2,
-        ROOM_WIDTH,
-        ROOM_HEIGHT,
-        "floor"
-    );
-
-    floor.setDepth(0);
-
-    const wall = this.add.tileSprite(
-      ROOM_WIDTH / 2, 
-      60,
-      ROOM_WIDTH,
-      127,
-      "wall-top"
-    );
-
-    wall.setDepth(5);
+    for (const config of hubTiles) {
+      createTileSprite(this, config);
+    }
 
     const wallCollider = this.add.rectangle(
       ROOM_WIDTH / 2,
-      115,
+      90,
       ROOM_WIDTH,
-      15
+      12
     );
 
     this.physics.add.existing(wallCollider, true);
 
     const noticeboard = this.add.image(
-      545,
-      90,
+      538,
+      38,
       "noticeboard"
     );
 
