@@ -5,9 +5,14 @@ import {
   type worldObjectType,
 } from "../config/types-global/worldObjectTypes";
 
+import {
+  createInteraction,
+} from "../interactions/createInteractions";
+
 import type {
-  SitInteraction,
+  Interaction,
 } from "../config/types-global/interactionTypes";
+
 
 export type worldObjectFacing =
   | "front"
@@ -15,18 +20,26 @@ export type worldObjectFacing =
   | "left"
   | "right";
 
+
 export type worldObjectPlacement = {
   type: worldObjectType;
+
   x: number;
   y: number;
+
   order?: number;
   facing?: worldObjectFacing;
+
+  containerId?: string;
 };
+
 
 export type worldObjectInstance = {
   gameObject: Phaser.GameObjects.Image;
-  interaction?: SitInteraction;
+
+  interaction?: Interaction;
 };
+
 
 export function createWorldObject(
   scene: Phaser.Scene,
@@ -36,6 +49,14 @@ export function createWorldObject(
   const worldObjectType =
     worldObjectTypes[placement.type];
 
+    console.log(
+    "TYPE CHECK:",
+    placement.type,
+    worldObjectType.interaction
+  );
+
+
+  // Texture bestimmen
   const texture =
     placement.facing &&
     worldObjectType.directionalTextures
@@ -44,7 +65,8 @@ export function createWorldObject(
         ]
       : worldObjectType.texture;
 
-  // Möbel MIT statischem Physics-Body erstellen
+
+  // WorldObject erstellen
   const worldObject =
     scene.physics.add.staticImage(
       placement.x,
@@ -52,8 +74,10 @@ export function createWorldObject(
       texture
     );
 
+
   const body =
     worldObject.body as Phaser.Physics.Arcade.StaticBody;
+
 
   // Collider-Größe
   body.setSize(
@@ -61,11 +85,13 @@ export function createWorldObject(
     worldObjectType.bodyHeight
   );
 
-  // Collider-Position innerhalb des Sprites
+
+  // Collider-Position
   body.setOffset(
     worldObjectType.offsetX,
     worldObjectType.offsetY
   );
+
 
   // Depth-System
   const sortY =
@@ -79,36 +105,41 @@ export function createWorldObject(
     sortY + order / 100
   );
 
-  // Player ↔ Möbel Collision
-  scene.physics.add.collider(
-      player,
-      worldObject
-    );
 
+  // Player ↔ WorldObject Collision
+  scene.physics.add.collider(
+    player,
+    worldObject
+  );
+
+
+  // Runtime-Instanz
   const instance: worldObjectInstance = {
     gameObject: worldObject,
   };
 
-  if (worldObjectType.seat) {
-    instance.interaction = {
-      type: "sit",
 
-      x:
-        placement.x +
-        worldObjectType.seat.offsetX,
+  // Interaction erzeugen
+  if (worldObjectType.interaction) {
+    instance.interaction =
+      createInteraction(
+        worldObjectType.interaction,
+        {
+          x: placement.x,
+          y: placement.y,
 
-      y:
-        placement.y +
-        worldObjectType.seat.offsetY,
+          facing:
+            placement.facing ?? "front",
 
-      facing:
-        placement.facing ?? "front",
+          worldObjectDepth:
+            worldObject.depth,
 
-      worldObjectDepth:
-        worldObject.depth,
-    };
+          containerId:
+            placement.containerId,
+        }
+      );
   }
 
-  return instance;
 
+  return instance;
 }

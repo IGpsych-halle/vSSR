@@ -4,6 +4,30 @@ export type InteractionFacing =
   | "left"
   | "right";
 
+
+// ========================================
+// CONFIG
+// Definition am Objekt
+// ========================================
+
+export type InteractionType =
+  | "sit"
+  | "noticeboard"
+  | "container";
+
+export type InteractionConfig = {
+  type: InteractionType;
+
+  offsetX: number;
+  offsetY: number;
+};
+
+
+// ========================================
+// RUNTIME INTERACTIONS
+// Konkrete Interaction im Raum
+// ========================================
+
 export type SitInteraction = {
   type: "sit";
 
@@ -11,7 +35,7 @@ export type SitInteraction = {
   y: number;
 
   facing: InteractionFacing;
-  furnitureDepth: number;
+  worldObjectDepth: number;
 };
 
 export type NoticeboardInteraction = {
@@ -21,6 +45,21 @@ export type NoticeboardInteraction = {
   y: number;
 };
 
+export type ContainerInteraction = {
+  type: "container";
+
+  x: number;
+  y: number;
+
+  containerId: string;
+};
+
+
+// ========================================
+// ALL RUNTIME INTERACTIONS
+// ========================================
+
 export type Interaction =
   | SitInteraction
-  | NoticeboardInteraction;
+  | NoticeboardInteraction
+  | ContainerInteraction;

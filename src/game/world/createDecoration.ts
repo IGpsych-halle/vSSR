@@ -12,18 +12,25 @@ import type {
   Interaction,
 } from "../config/types-global/interactionTypes";
 
+import { createInteraction } from "../interactions/createInteractions";
+
+
 export type DecorationInstance = {
   gameObject: Phaser.GameObjects.Image;
   interaction?: Interaction;
 };
 
+
 export function createDecoration(
   scene: Phaser.Scene,
   placement: DecorationPlacement
 ): DecorationInstance {
+
   const decorationType =
     decorationTypes[placement.type];
 
+
+  // Decoration erstellen
   const decoration = scene.add.image(
     placement.x,
     placement.y,
@@ -34,26 +41,25 @@ export function createDecoration(
     decorationType.depth
   );
 
+
+  // Runtime-Instanz
   const instance: DecorationInstance = {
     gameObject: decoration,
   };
 
+
+  // Interaction erzeugen
   if (decorationType.interaction) {
-    if (decorationType.interaction) {
-      instance.interaction = {
-        type:
-          decorationType.interaction.type,
-
-        x:
-          placement.x +
-          decorationType.interaction.offsetX,
-
-        y:
-          placement.y +
-          decorationType.interaction.offsetY,
-      };
-    }
+    instance.interaction =
+      createInteraction(
+        decorationType.interaction,
+        {
+          x: placement.x,
+          y: placement.y,
+        }
+      );
   }
+
 
   return instance;
 }

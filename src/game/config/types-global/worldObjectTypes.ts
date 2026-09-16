@@ -1,12 +1,16 @@
-export type worldObjectTypeConfig = {
-  texture: string;
+import type {
+  InteractionConfig,
+} from "./interactionTypes";
 
-  directionalTextures?: {
-    front: string;
-    back: string;
-    left: string;
-    right: string;
-  };
+
+export type worldObjectType =
+  | "table"
+  | "bookshelfNarrow"
+  | "chair";
+
+
+export type WorldObjectTypeConfig = {
+  texture: string;
 
   bodyWidth: number;
   bodyHeight: number;
@@ -16,64 +20,70 @@ export type worldObjectTypeConfig = {
 
   sortYOffset: number;
 
-  seat?: {
-    offsetX: number;
-    offsetY: number;
+  directionalTextures?: {
+    front: string;
+    back: string;
+    left: string;
+    right: string;
   };
+
+  interaction?: InteractionConfig;
 };
 
-export type worldObjectType =
-  | "table"
-  | "bookshelfNarrow"
-  | "chair";
 
 export const worldObjectTypes: Record<
   worldObjectType,
-  worldObjectTypeConfig
+  WorldObjectTypeConfig
 > = {
-    table: {
+
+  table: {
     texture: "table",
+
     bodyWidth: 72,
     bodyHeight: 25,
+
     offsetX: 4,
     offsetY: 20,
-    sortYOffset: 0,
+
+    sortYOffset: 24,
   },
+
 
   bookshelfNarrow: {
     texture: "bookshelf-narrow",
+
     bodyWidth: 40,
     bodyHeight: 30,
+
     offsetX: 6,
     offsetY: 62,
+
     sortYOffset: 30,
   },
 
+
   chair: {
-    texture: "chair",
+    texture: "chair-front",
+
     directionalTextures: {
-        front: "chair-front",
-        back: "chair-back",
-        left: "chair-left",
-        right: "chair-right",
+      front: "chair-front",
+      back: "chair-back",
+      left: "chair-left",
+      right: "chair-right",
     },
+
     bodyWidth: 20,
     bodyHeight: 12,
-    offsetX: 10,
+
+    offsetX: 5,
     offsetY: 25,
-    sortYOffset: 8,
 
-    seat: {
-        offsetX: -1,
-        offsetY: -11,
+    sortYOffset: 18,
+
+    interaction: {
+      type: "sit",
+      offsetX: -1,
+      offsetY: -10,
     },
-  }
+  },
 };
-
-
-
-
-
-
-
-
