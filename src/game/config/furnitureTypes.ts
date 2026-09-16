@@ -67,7 +67,7 @@ export const furnitureTypes: Record<
         offsetX: -1,
         offsetY: -11,
     },
-  },
+  }
 };
 
 

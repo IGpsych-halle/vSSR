@@ -12,6 +12,10 @@ import {
 
 import { hubTiles } from "../config/hubTiles";
 
+import { hubDecorations } from "../config/hubDecorations";
+
+
+
 //import creator-files
 import {
   createFurniture,
@@ -20,6 +24,7 @@ import {
   type Seat,
 } from "../world/createFurniture";
 import { createTileSprite } from "../world/createTileSprite";
+import { createDecoration } from "../world/createDecoration";
 
 //import interactions
 import { findNearbyInteraction } from "../interactions/findNearbyInteraction";
@@ -118,6 +123,10 @@ export class RoomScene extends Phaser.Scene {
     // 2. Tiles / Hintergrund
     for (const config of hubTiles) {
       createTileSprite(this, config);
+    }
+
+    for (const config of hubDecorations) {
+      createDecoration(this, config);
     }
 
 
@@ -236,27 +245,6 @@ export class RoomScene extends Phaser.Scene {
         this.seats.push(furniture.seat);
       }
     }
-
-
-    // 10. Debug UI zuletzt
-    this.sortYDebugText = this.add.text(
-      10,
-      10,
-      "",
-      {
-        fontSize: "12px",
-        color: "#ffffff",
-        backgroundColor: "#000000",
-        padding: {
-          x: 4,
-          y: 2,
-        },
-      }
-    );
-
-    this.sortYDebugText
-      .setScrollFactor(0)
-      .setDepth(999999);
   }
 
   update() {
@@ -313,10 +301,6 @@ export class RoomScene extends Phaser.Scene {
         playerBody.bottom + 0.5
       );
     }
-
-    this.sortYDebugText.setText(
-      `Player sortY: ${Math.round(playerBody.bottom)}`
-    );
  }
     
 }

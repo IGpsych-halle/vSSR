@@ -13,8 +13,11 @@ import chairBackSprite from "./furniture/chairs/chair_back.png";
 import chairLeftSprite from "./furniture/chairs/chair_left.png";
 import chairRightSprite from "./furniture/chairs/chair_right.png";
 
-// Interactables
+// Interactibles
 import noticeboardSprite from "./interactives/noticeboard.png";
+
+//Decorations
+import rugGreenSprite from "./decorations/rug_green.png";
 
 export function loadHubAssets(scene: Phaser.Scene) {
   // Tilesets
@@ -28,14 +31,17 @@ export function loadHubAssets(scene: Phaser.Scene) {
     bookshelfNarrowSprite
   );
   
+  //Interactibles
   scene.load.image("chair-front", chairFrontSprite);
   scene.load.image("chair-back", chairBackSprite);
   scene.load.image("chair-left", chairLeftSprite);
   scene.load.image("chair-right", chairRightSprite);
 
-  // Interactables
   scene.load.image(
     "noticeboard",
     noticeboardSprite
   );
+
+  //Decorations
+  scene.load.image("rug-green", rugGreenSprite);
 }
