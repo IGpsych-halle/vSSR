@@ -49,13 +49,6 @@ export function createWorldObject(
   const worldObjectType =
     worldObjectTypes[placement.type];
 
-    console.log(
-    "TYPE CHECK:",
-    placement.type,
-    worldObjectType.interaction
-  );
-
-
   // Texture bestimmen
   const texture =
     placement.facing &&

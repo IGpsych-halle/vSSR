@@ -213,6 +213,14 @@ export class RoomScene extends Phaser.Scene {
             "Noticeboard öffnen"
           );
         }
+        if (
+          interaction?.type === "container"
+        ) {
+          console.log(
+            "Container öffnen:",
+            interaction.containerId
+          );
+        }
       }
     }
 

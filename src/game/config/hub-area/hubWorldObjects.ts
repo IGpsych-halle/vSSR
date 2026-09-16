@@ -52,4 +52,10 @@ export const hubWorldObjects: worldObjectPlacement[] = [
     y: 470,
     facing: "right",
   },
+  {
+    type: "chest",
+    x: 700,
+    y: 400,
+    containerId: "hub-chest-01",
+  },
 ];

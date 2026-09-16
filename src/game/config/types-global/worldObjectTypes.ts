@@ -6,7 +6,8 @@ import type {
 export type worldObjectType =
   | "table"
   | "bookshelfNarrow"
-  | "chair";
+  | "chair"
+  | "chest";
 
 
 export type WorldObjectTypeConfig = {
@@ -84,6 +85,23 @@ export const worldObjectTypes: Record<
       type: "sit",
       offsetX: -1,
       offsetY: -10,
+    },
+  },
+  chest: {
+    texture: "chest",
+
+    bodyWidth: 20,
+    bodyHeight: 12,
+
+    offsetX: 6,
+    offsetY: 20,
+
+    sortYOffset: 18,
+
+    interaction: {
+      type: "container",
+      offsetX: 0,
+      offsetY: 20,
     },
   },
 };

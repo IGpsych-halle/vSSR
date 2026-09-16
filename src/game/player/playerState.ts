@@ -1,15 +1,22 @@
-import type { Seat } from "../world/createWorldObjects";
+import type {
+  SitInteraction,
+} from "../config/types-global/interactionTypes";
+
 
 export type PlayerPosition = {
   x: number;
   y: number;
 };
 
+
 export type PlayerState = {
   isSitting: boolean;
-  currentSeat: Seat | null;
+
+  currentSeat: SitInteraction | null;
+
   positionBeforeSitting: PlayerPosition | null;
 };
+
 
 export function createPlayerState(): PlayerState {
   return {

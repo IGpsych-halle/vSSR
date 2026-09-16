@@ -36,7 +36,7 @@ export function loadHubAssets(scene: Phaser.Scene) {
   scene.load.image("chair-back", chairBackSprite);
   scene.load.image("chair-left", chairLeftSprite);
   scene.load.image("chair-right", chairRightSprite);
-  scene.load.image("treasure-chest", chestSprite);
+  scene.load.image("chest", chestSprite);
 
   //Decorations
   scene.load.image("rug-green", rugGreenSprite);
