@@ -1,4 +1,4 @@
-export type FurnitureTypeConfig = {
+export type worldObjectTypeConfig = {
   texture: string;
 
   directionalTextures?: {
@@ -22,14 +22,14 @@ export type FurnitureTypeConfig = {
   };
 };
 
-export type FurnitureType =
+export type worldObjectType =
   | "table"
   | "bookshelfNarrow"
   | "chair";
 
-export const furnitureTypes: Record<
-  FurnitureType,
-  FurnitureTypeConfig
+export const worldObjectTypes: Record<
+  worldObjectType,
+  worldObjectTypeConfig
 > = {
     table: {
     texture: "table",

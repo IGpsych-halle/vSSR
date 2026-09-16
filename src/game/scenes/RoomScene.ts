@@ -4,29 +4,23 @@ import { loadHubAssets } from "../../assets/loadHubAssets";
 import { loadPlayerAssets } from "../player/loadPlayerAssets";
 
 //room-config
-import {
-  ROOM_WIDTH,
-  ROOM_HEIGHT,
-  PLAYER_SPEED,
-} from "../config/roomConfig";
-
-import { hubTiles } from "../config/hubTiles";
-
-import { hubDecorations } from "../config/hubDecorations";
-
-
+import {ROOM_WIDTH, ROOM_HEIGHT, PLAYER_SPEED} from "../config/roomConfig";
+import { hubLayers } from "../config/hub-area/hubLayers";
+import { hubWorldObjects } from "../config/hub-area/hubWorldObjects";
+import { hubDecorations } from "../config/hub-area/hubDecorations";
 
 //import creator-files
 import {
-  createFurniture,
-  type FurniturePlacement,
-  type FurnitureInstance,
-  type Seat,
-} from "../world/createFurniture";
-import { createTileSprite } from "../world/createTileSprite";
+  createWorldObject,
+  type worldObjectInstance,
+} from "../world/createWorldObjects";
+import { createRoomLayer } from "../world/createRoomLayer";
 import { createDecoration } from "../world/createDecoration";
 
 //import interactions
+import type {
+  Interaction,
+} from "../config/types-global/interactionTypes";
 import { findNearbyInteraction } from "../interactions/findNearbyInteraction";
 import { sitDown } from "../interactions/sitDown";
 import { standUp } from "../interactions/standUp";
@@ -60,11 +54,8 @@ export class RoomScene extends Phaser.Scene {
     D: Phaser.Input.Keyboard.Key;
   };
 
-  private furniture: FurnitureInstance[] = [];
-  private seats: Seat[] = [];
-
-  //Debug-Variables
-  private sortYDebugText!: Phaser.GameObjects.Text;
+  private worldObjects: worldObjectInstance[] = [];
+  private interactions: Interaction[] = [];
 
   constructor() {
     super("RoomScene");
@@ -78,7 +69,7 @@ export class RoomScene extends Phaser.Scene {
   }
 
   create() {
-    // 1. Welt / Physics zuerst initialisieren
+    // 1. Create World and Player
     this.physics.world.setBounds(
       0,
       0,
@@ -120,40 +111,11 @@ export class RoomScene extends Phaser.Scene {
     );
 
 
-    // 2. Tiles / Hintergrund
-    for (const config of hubTiles) {
-      createTileSprite(this, config);
+    for (const config of hubLayers) {
+      createRoomLayer(this, this.player, config);
     }
 
-    for (const config of hubDecorations) {
-      createDecoration(this, config);
-    }
-
-
-    // 3. Wall Collider
-    const wallCollider = this.add.rectangle(
-      ROOM_WIDTH / 2,
-      90,
-      ROOM_WIDTH,
-      12
-    );
-
-    this.physics.add.existing(
-      wallCollider,
-      true
-    );
-
-
-    // 4. Noticeboard
-    const noticeboard = this.add.image(
-      538,
-      38,
-      "noticeboard"
-    );
-
-    noticeboard.setDepth(10);
-
-    // 7. Input
+    // 7. Create Input
     this.cursors =
       this.input.keyboard!.createCursorKeys();
 
@@ -175,74 +137,39 @@ export class RoomScene extends Phaser.Scene {
     );
 
 
-    // 8. Animationen
+    // 8. Create Animations
     createPlayerAnimations(this);
 
+    // 9. Create worldObject
 
-    // 9. Furniture
-    const furnitureConfigs: FurniturePlacement[] = [
-      {
-        type: "table",
-        x: 530,
-        y: 150,
-        order: 50,
-      },
-      {
-        type: "bookshelfNarrow",
-        x: 450,
-        y: 80,
-      },
-      {
-        type: "chair",
-        x: 500,
-        y: 300,
-        order: 20,
-        facing: "front",
-      },
-      {
-        type: "chair",
-        x: 650,
-        y: 170,
-        order: 70,
-        facing: "back",
-      },
-      {
-        type: "chair",
-        x: 450,
-        y: 470,
-        facing: "front",
-      },
-      {
-        type: "chair",
-        x: 500,
-        y: 470,
-        facing: "back",
-      },
-      {
-        type: "chair",
-        x: 550,
-        y: 470,
-        facing: "left",
-      },
-      {
-        type: "chair",
-        x: 600,
-        y: 470,
-        facing: "right",
-      },
-    ];
-
-    for (const config of furnitureConfigs) {
-      const furniture = createFurniture(
+    for (const config of hubWorldObjects) {
+      const worldObject = createWorldObject(
         this,
         this.player,
         config
       );
 
-      this.furniture.push(furniture);
+      this.worldObjects.push(
+        worldObject
+      );
 
-      if (furniture.seat) {
-        this.seats.push(furniture.seat);
+      if (worldObject.interaction) {
+        this.interactions.push(
+          worldObject.interaction
+        );
+      }
+    }
+
+    for (const config of hubDecorations) {
+      const decoration = createDecoration(
+        this,
+        config
+      );
+
+      if (decoration.interaction) {
+        this.interactions.push(
+          decoration.interaction
+        );
       }
     }
   }
@@ -263,17 +190,27 @@ export class RoomScene extends Phaser.Scene {
           this.facing
         );
       } else {
-        const seat = findNearbyInteraction(
+        const interaction = findNearbyInteraction(
           this.player.x,
           this.player.y,
-          this.seats
+          this.interactions
         );
 
-        if (seat) {
+        if (
+          interaction?.type === "sit"
+        ) {
           sitDown(
             this.player,
             this.playerState,
-            seat
+            interaction
+          );
+        }
+
+        if (
+          interaction?.type === "noticeboard"
+        ) {
+          console.log(
+            "Noticeboard öffnen"
           );
         }
       }

@@ -1,4 +1,4 @@
-import type { Seat } from "../world/createFurniture";
+import type { Seat } from "../world/createWorldObjects";
 
 export type PlayerPosition = {
   x: number;

@@ -76,11 +76,6 @@ export function updatePlayerMovement(
       direction.x,
       direction.y
     );
-    console.log(
-      "speed:", speed,
-      "velocity:", direction.x, direction.y,
-      "player:", player.x, player.y
-    );
   } else {
     player.setVelocity(0, 0);
     player.stop();
