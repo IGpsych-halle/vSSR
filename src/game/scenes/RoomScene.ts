@@ -40,6 +40,10 @@ import {updatePlayerMovement, type Facing} from "../player/playerMovement";
 import {createInventoryState, type InventoryState} from "../player/inventory/inventoryState";
 import {addItemToInventory} from "../player/inventory/addItemToInventory";
 
+//imports for UI
+
+import { uiState } from "../state/uiState";
+
 export class RoomScene extends Phaser.Scene {
   private player!: Phaser.Physics.Arcade.Sprite;
   private facing: Facing = "front";
@@ -256,9 +260,13 @@ export class RoomScene extends Phaser.Scene {
       }
     }
 
+    if (uiState.blocksPlayerInput) {
+      this.player.setVelocity(0, 0);
+    }
+
     //Movement 
 
-    if (!this.playerState.isSitting) {
+    if (!this.playerState.isSitting && !uiState.blocksPlayerInput) {
       this.facing = updatePlayerMovement(
         this.player,
         {
