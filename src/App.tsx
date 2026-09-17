@@ -20,7 +20,6 @@ function App() {
   const [inventoryOpen, setInventoryOpen] =
     useState(false);
 
-
   useEffect(() => {
     const game =
       startGame("game-container");

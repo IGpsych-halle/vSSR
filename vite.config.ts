@@ -11,5 +11,12 @@ export default defineConfig({
         pollInterval: 50,
       },
     },
+
+    proxy: {
+      "/api": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+      },
+    },
   },
 });
