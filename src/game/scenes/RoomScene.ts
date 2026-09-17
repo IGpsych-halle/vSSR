@@ -16,6 +16,7 @@ import {
 } from "../world/createWorldObjects";
 import { createRoomLayer } from "../world/createRoomLayer";
 import { createDecoration } from "../world/createDecoration";
+import { createWorldItem, type WorldItem} from "../items/createWorldItem";
 
 //import interactions
 import type {
@@ -25,18 +26,14 @@ import { findNearbyInteraction } from "../interactions/findNearbyInteraction";
 import { sitDown } from "../interactions/sitDown";
 import { standUp } from "../interactions/standUp";
 
+import { updateWorldItems } from "../items/updateWorldItems";
+
 
 //imports for player
 import { createPlayerAnimations } from "../player/playerAnimations";
-import {
-  createPlayerState,
-  type PlayerState,
-} from "../player/playerState";
+import {createPlayerState, type PlayerState} from "../player/playerState";
 
-import {
-  updatePlayerMovement,
-  type Facing,
-} from "../player/playerMovement";
+import {updatePlayerMovement, type Facing} from "../player/playerMovement";
 
 export class RoomScene extends Phaser.Scene {
   private player!: Phaser.Physics.Arcade.Sprite;
@@ -55,6 +52,7 @@ export class RoomScene extends Phaser.Scene {
   };
 
   private worldObjects: worldObjectInstance[] = [];
+  private worldItems: WorldItem[] = [];
   private interactions: Interaction[] = [];
 
   constructor() {
@@ -172,9 +170,20 @@ export class RoomScene extends Phaser.Scene {
         );
       }
     }
+
+    const testDextrose = createWorldItem(
+      this,
+      "dextrose",
+      600,
+      400
+    );
+
+    this.worldItems.push(
+      testDextrose
+    );
   }
 
-  update() {
+  update(time: number) {
 
      //Interactions in Room-Scene
 
@@ -246,6 +255,12 @@ export class RoomScene extends Phaser.Scene {
         playerBody.bottom + 0.5
       );
     }
+
+    updateWorldItems(
+      this.worldItems,
+      this.player,
+      time
+    );
  }
     
 }

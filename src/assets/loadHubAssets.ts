@@ -21,6 +21,9 @@ import chestSprite from "./worldObjects/containers/treasurechest1.png";
 import rugGreenSprite from "./decorations/rug_green.png";
 import noticeboardSprite from "./decorations/noticeboard.png";
 
+//items
+import dextroseSprite from "./worldObjects/items/dextrose.png";
+
 export function loadHubAssets(scene: Phaser.Scene) {
   // Tilesets
   scene.load.image("floor", floorWood);
@@ -41,4 +44,7 @@ export function loadHubAssets(scene: Phaser.Scene) {
   //Decorations
   scene.load.image("rug-green", rugGreenSprite);
   scene.load.image("noticeboard", noticeboardSprite);
+
+  //items
+  scene.load.image("dextrose", dextroseSprite);
 }
