@@ -52,10 +52,7 @@ export function updateWorldItems(
     // ========================================
 
     if (distance <= PICKUP_RADIUS) {
-      console.log(
-        "Picked up:",
-        worldItem.itemType
-      );
+      console.log("Picked up:", worldItem.stack.itemType, "Amount:", worldItem.stack.amount);
 
       sprite.destroy();
 

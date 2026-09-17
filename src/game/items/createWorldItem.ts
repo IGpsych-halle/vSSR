@@ -2,29 +2,28 @@ import Phaser from "phaser";
 
 import {
   itemTypes,
-  type ItemType,
 } from "./itemTypes";
+
+import type {
+  ItemStack,
+} from "./itemState";
 
 
 export type WorldItem = {
-  itemType: ItemType;
-
+  stack: ItemStack;
   sprite: Phaser.Physics.Arcade.Sprite;
-
   baseY: number;
 };
 
 
 export function createWorldItem(
   scene: Phaser.Scene,
-  itemType: ItemType,
+  stack: ItemStack,
   x: number,
   y: number
 ): WorldItem {
-
   const config =
-    itemTypes[itemType];
-
+    itemTypes[stack.itemType];
 
   const sprite =
     scene.physics.add.sprite(
@@ -33,21 +32,17 @@ export function createWorldItem(
       config.texture
     );
 
-
-  // Items sollen nicht durch die Welt fallen.
-  // Wir verwenden Arcade Physics später nur
-  // für Bewegung Richtung Spieler.
   sprite.body!.allowGravity = false;
 
+  const body =
+    sprite.body as Phaser.Physics.Arcade.Body;
 
-  // Über dem Boden / WorldObjects anzeigen
-  const body = sprite.body as Phaser.Physics.Arcade.Body;
-
-  sprite.setDepth(body.bottom + 0.5);
-
+  sprite.setDepth(
+    body.bottom + 0.5
+  );
 
   return {
-    itemType,
+    stack,
     sprite,
     baseY: y,
   };

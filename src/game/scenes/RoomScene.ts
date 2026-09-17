@@ -171,12 +171,16 @@ export class RoomScene extends Phaser.Scene {
       }
     }
 
-    const testDextrose = createWorldItem(
-      this,
-      "dextrose",
-      600,
-      400
-    );
+    const testDextrose =
+      createWorldItem(
+        this,
+        {
+          itemType: "dextrose",
+          amount: 1,
+        },
+        600,
+        400
+      );
 
     this.worldItems.push(
       testDextrose
