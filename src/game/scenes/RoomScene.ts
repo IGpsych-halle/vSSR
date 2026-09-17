@@ -35,11 +35,18 @@ import {createPlayerState, type PlayerState} from "../player/playerState";
 
 import {updatePlayerMovement, type Facing} from "../player/playerMovement";
 
+//---- inventory
+
+import {createInventoryState, type InventoryState} from "../player/inventory/inventoryState";
+import {addItemToInventory} from "../player/inventory/addItemToInventory";
+
 export class RoomScene extends Phaser.Scene {
   private player!: Phaser.Physics.Arcade.Sprite;
   private facing: Facing = "front";
   private playerState: PlayerState =
   createPlayerState();
+
+  private inventory: InventoryState = createInventoryState();
 
   private interactKey!: Phaser.Input.Keyboard.Key;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -182,8 +189,20 @@ export class RoomScene extends Phaser.Scene {
         400
       );
 
-    this.worldItems.push(
-      testDextrose
+    const testDextrose2 =
+      createWorldItem(
+        this,
+        {
+          itemType: "dextrose",
+          amount: 4,
+        },
+        650,
+        400
+      );
+    
+      this.worldItems.push(
+      testDextrose,
+      testDextrose2
     );
   }
 
@@ -260,11 +279,24 @@ export class RoomScene extends Phaser.Scene {
       );
     }
 
-    updateWorldItems(
-      this.worldItems,
-      this.player,
-      time
-    );
+    const pickedUpStacks =
+      updateWorldItems(
+        this.worldItems,
+        this.player,
+        time
+      );
+
+    for (const stack of pickedUpStacks) {
+      addItemToInventory(
+        this.inventory,
+        stack
+      );
+
+      console.log(
+        "Inventory:",
+        this.inventory.items
+      );
+    }
  }
     
 }

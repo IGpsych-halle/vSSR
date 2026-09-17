@@ -4,6 +4,10 @@ import type {
   WorldItem,
 } from "./createWorldItem";
 
+import type {
+  ItemStack,
+} from "./itemState";
+
 
 const ATTRACT_RADIUS = 60;
 const PICKUP_RADIUS = 8;
@@ -19,6 +23,7 @@ export function updateWorldItems(
   player: Phaser.Physics.Arcade.Sprite,
   time: number
 ) {
+  const pickedUpStacks: ItemStack[] = [];
   for (
     let i = worldItems.length - 1;
     i >= 0;
@@ -52,13 +57,13 @@ export function updateWorldItems(
     // ========================================
 
     if (distance <= PICKUP_RADIUS) {
-      console.log("Picked up:", worldItem.stack.itemType, "Amount:", worldItem.stack.amount);
+        pickedUpStacks.push(
+            worldItem.stack
+        );
 
-      sprite.destroy();
-
-      worldItems.splice(i, 1);
-
-      continue;
+        sprite.destroy();
+        worldItems.splice(i, 1);
+        continue;
     }
 
 
@@ -93,11 +98,7 @@ export function updateWorldItems(
 
     sprite.setVelocity(0, 0);
 
-    sprite.y =
-      worldItem.baseY +
-      Math.sin(
-        time * BOB_SPEED
-      ) *
-        BOB_AMPLITUDE;
+    sprite.y = worldItem.baseY + Math.sin(time * BOB_SPEED) * BOB_AMPLITUDE;
   }
+  return pickedUpStacks;
 }
