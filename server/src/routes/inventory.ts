@@ -11,10 +11,8 @@ import {
   type AuthenticatedRequest,
 } from "../middleware/requireAuth.js";
 
-
 export const inventoryRouter =
   Router();
-
 
 inventoryRouter.get(
   "/",

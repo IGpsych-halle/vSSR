@@ -15,55 +15,37 @@ import {
   uiState,
 } from "./game/state/uiState";
 
-/* import {
+import {
   useAuth,
 } from "./auth/useAuth";
-*/
-import {
-  apiFetch,
-} from "./api/apiClient";
 
 
 function App() {
+  const {
+    loading,
+  } = useAuth();
 
-  const [inventoryOpen, setInventoryOpen] =
+  const [
+    inventoryOpen,
+    setInventoryOpen,
+  ] =
     useState(false);
 
+
   useEffect(() => {
-  async function testInventory() {
-    try {
-      const response =
-        await apiFetch(
-          "/api/inventory"
-        );
-
-      const data =
-        await response.json();
-
-      console.log(
-        "Inventory response:",
-        data
-      );
-    } catch (error) {
-      console.error(
-        "Inventory request failed:",
-        error
-      );
+    if (loading) {
+      return;
     }
-  }
 
-
-  testInventory();
-}, []);
-
-
-  useEffect(() => {
     const game =
-      startGame("game-container");
+      startGame(
+        "game-container"
+      );
 
-    return () =>
+    return () => {
       game.destroy(true);
-  }, []);
+    };
+  }, [loading]);
 
 
   useEffect(() => {
@@ -74,13 +56,17 @@ function App() {
         return;
       }
 
-      setInventoryOpen(current => {
-        const next = !current;
+      setInventoryOpen(
+        current => {
+          const next =
+            !current;
 
-        uiState.inventoryOpen = next;
+          uiState.inventoryOpen =
+            next;
 
-        return next;
-      });
+          return next;
+        }
+      );
     }
 
     window.addEventListener(
@@ -95,6 +81,15 @@ function App() {
       );
     };
   }, []);
+
+
+  if (loading) {
+    return (
+      <div>
+        Loading...
+      </div>
+    );
+  }
 
 
   return (

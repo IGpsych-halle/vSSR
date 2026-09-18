@@ -1,6 +1,6 @@
 import type {
   ItemType,
-} from "./itemTypes";
+} from "./itemTypes.js";
 
 
 export type ItemStack = {

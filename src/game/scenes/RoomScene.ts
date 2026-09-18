@@ -4,7 +4,7 @@ import { loadHubAssets } from "../../assets/loadHubAssets";
 import { loadPlayerAssets } from "../player/loadPlayerAssets";
 
 //room-config
-import {ROOM_WIDTH, ROOM_HEIGHT, PLAYER_SPEED} from "../config/roomConfig";
+import { ROOM_WIDTH, ROOM_HEIGHT, PLAYER_SPEED } from "../config/roomConfig";
 import { hubLayers } from "../config/hub-area/hubLayers";
 import { hubWorldObjects } from "../config/hub-area/hubWorldObjects";
 import { hubDecorations } from "../config/hub-area/hubDecorations";
@@ -14,9 +14,12 @@ import {
   createWorldObject,
   type worldObjectInstance,
 } from "../world/createWorldObjects";
-import { createRoomLayer } from "../world/createRoomLayer";
+import {
+  createRoomLayer,
+  type RoomLayerInstance,
+} from "../world/createRoomLayer";
 import { createDecoration } from "../world/createDecoration";
-import { createWorldItem, type WorldItem} from "../items/createWorldItem";
+import { createWorldItem, type WorldItem } from "../items/createWorldItem";
 
 //import interactions
 import type {
@@ -26,19 +29,31 @@ import { findNearbyInteraction } from "../interactions/findNearbyInteraction";
 import { sitDown } from "../interactions/sitDown";
 import { standUp } from "../interactions/standUp";
 
-import { updateWorldItems } from "../items/updateWorldItems";
-
-
 //imports for player
 import { createPlayerAnimations } from "../player/playerAnimations";
-import {createPlayerState, type PlayerState} from "../player/playerState";
+import { createPlayerState, type PlayerState } from "../player/playerState";
 
-import {updatePlayerMovement, type Facing} from "../player/playerMovement";
+import { updatePlayerMovement, type Facing } from "../player/playerMovement";
 
 //---- inventory
 
-import {createInventoryState, type InventoryState} from "../player/inventory/inventoryState";
-import {addItemToInventory} from "../player/inventory/addItemToInventory";
+import { createInventoryState, type InventoryState } from "../player/inventory/inventoryState";
+import { addItemToInventory } from "../player/inventory/addItemToInventory";
+
+//items
+import { updateWorldItems } from "../items/updateWorldItems";
+
+import {
+  animateWorldItemRejected,
+} from "../items/animations/animateWorldItemRejected";
+
+import {
+  dropWorldItems,
+} from "../items/dropWorldItems";
+
+import {
+  findNearbyWorldItem,
+} from "../items/findNearbyWorldItem";
 
 //imports for UI
 
@@ -48,7 +63,7 @@ export class RoomScene extends Phaser.Scene {
   private player!: Phaser.Physics.Arcade.Sprite;
   private facing: Facing = "front";
   private playerState: PlayerState =
-  createPlayerState();
+    createPlayerState();
 
   private inventory: InventoryState = createInventoryState();
 
@@ -63,6 +78,7 @@ export class RoomScene extends Phaser.Scene {
   };
 
   private worldObjects: worldObjectInstance[] = [];
+  private roomLayers: RoomLayerInstance[] = [];
   private worldItems: WorldItem[] = [];
   private interactions: Interaction[] = [];
 
@@ -72,8 +88,8 @@ export class RoomScene extends Phaser.Scene {
 
   preload() {
 
-  loadHubAssets(this);
-  loadPlayerAssets(this);
+    loadHubAssets(this);
+    loadPlayerAssets(this);
 
   }
 
@@ -88,7 +104,7 @@ export class RoomScene extends Phaser.Scene {
 
     this.player = this.physics.add.sprite(
       600,
-      500,
+      400,
       "player-front"
     );
 
@@ -121,7 +137,16 @@ export class RoomScene extends Phaser.Scene {
 
 
     for (const config of hubLayers) {
-      createRoomLayer(this, this.player, config);
+      const roomLayer =
+        createRoomLayer(
+          this,
+          this.player,
+          config
+        );
+
+      this.roomLayers.push(
+        roomLayer
+      );
     }
 
     // 7. Create Input
@@ -182,43 +207,107 @@ export class RoomScene extends Phaser.Scene {
       }
     }
 
-    const testDextrose =
-      createWorldItem(
-        this,
-        {
-          itemType: "dextrose",
-          amount: 1,
-        },
-        600,
-        400
-      );
-
-    const testDextrose2 =
-      createWorldItem(
-        this,
-        {
-          itemType: "dextrose",
-          amount: 4,
-        },
-        650,
-        400
-      );
-    
-      this.worldItems.push(
-      testDextrose,
-      testDextrose2
+    this.time.delayedCall(
+      3000,
+      () => {
+        dropWorldItems(
+          this,
+          this.worldItems,
+          this.worldObjects,
+          this.roomLayers,
+          625,
+          400,
+          [
+            {
+              itemType: "dextrose",
+              amount: 1,
+            },
+            {
+              itemType: "dextrose",
+              amount: 120,
+            },
+            {
+              itemType: "dextrose",
+              amount: 2,
+            },
+            {
+              itemType: "dextrose",
+              amount: 3,
+            },
+          ]
+        );
+      }
     );
+
   }
 
   update(time: number) {
 
-     //Interactions in Room-Scene
+    //Interactions in Room-Scene
 
     if (
       Phaser.Input.Keyboard.JustDown(
         this.interactKey
       )
     ) {
+      const nearbyWorldItem =
+        findNearbyWorldItem(
+          this.player,
+          this.worldItems
+        );
+
+
+      if (nearbyWorldItem) {
+        const result =
+          addItemToInventory(
+            this.inventory,
+            nearbyWorldItem.stack
+          );
+
+        this.inventory =
+          result.inventory;
+
+        if (result.addedAmount === 0) {
+          animateWorldItemRejected(
+            nearbyWorldItem,
+            this.player,
+            this.worldObjects,
+            this.roomLayers
+          );
+
+          return;
+        }
+
+        if (result.remainingAmount === 0) {
+          nearbyWorldItem.sprite.destroy();
+
+          const index =
+            this.worldItems.indexOf(
+              nearbyWorldItem
+            );
+
+          if (index !== -1) {
+            this.worldItems.splice(
+              index,
+              1
+            );
+          }
+        }
+
+        if (
+          result.addedAmount > 0 &&
+          result.remainingAmount > 0
+        ) {
+          nearbyWorldItem.stack = {
+            ...nearbyWorldItem.stack,
+            amount:
+              result.remainingAmount,
+          };
+        }
+
+        return;
+      }
+
       if (this.playerState.isSitting) {
         standUp(
           this.player,
@@ -287,24 +376,11 @@ export class RoomScene extends Phaser.Scene {
       );
     }
 
-    const pickedUpStacks =
-      updateWorldItems(
-        this.worldItems,
-        this.player,
-        time
-      );
+    updateWorldItems(
+      this.worldItems,
+      time
+    )
 
-    for (const stack of pickedUpStacks) {
-      addItemToInventory(
-        this.inventory,
-        stack
-      );
+  }
 
-      console.log(
-        "Inventory:",
-        this.inventory.items
-      );
-    }
- }
-    
 }

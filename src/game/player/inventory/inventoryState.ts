@@ -1,15 +1,8 @@
-import type {
-  ItemStack,
-} from "../../../../shared/items/itemState";
+export type {
+  InventorySlot,
+  InventoryState,
+} from "../../../../shared/inventory/inventoryTypes.js";
 
-
-export type InventoryState = {
-  items: ItemStack[];
-};
-
-
-export function createInventoryState(): InventoryState {
-  return {
-    items: [],
-  };
-}
+export {
+  createInventoryState,
+} from "../../../../shared/inventory/inventoryTypes.js";

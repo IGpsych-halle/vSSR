@@ -1,0 +1,1 @@
+export const INVENTORY_SLOT_COUNT = 10;
