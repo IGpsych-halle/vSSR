@@ -6,7 +6,7 @@ import type {
 
 import type {
   ItemStack,
-} from "./itemState";
+} from "../../../shared/items/itemState";
 
 
 const ATTRACT_RADIUS = 60;

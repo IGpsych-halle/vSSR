@@ -1,10 +1,10 @@
 import {
   itemTypes,
-} from "../../items/itemTypes";
+} from "../../../../shared/items/itemTypes";
 
 import type {
   ItemStack,
-} from "../../items/itemState";
+} from "../../../../shared/items/itemState";
 
 import type {
   InventoryState,

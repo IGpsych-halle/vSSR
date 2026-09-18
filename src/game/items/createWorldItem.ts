@@ -1,12 +1,12 @@
 import Phaser from "phaser";
 
-import {
-  itemTypes,
-} from "./itemTypes";
-
 import type {
   ItemStack,
-} from "./itemState";
+} from "../../../shared/items/itemState.ts";
+
+import {
+  itemTextures,
+} from "./itemVisuals";
 
 
 export type WorldItem = {
@@ -22,14 +22,14 @@ export function createWorldItem(
   x: number,
   y: number
 ): WorldItem {
-  const config =
-    itemTypes[stack.itemType];
+  const texture =
+    itemTextures[stack.itemType];
 
   const sprite =
     scene.physics.add.sprite(
       x,
       y,
-      config.texture
+      texture
     );
 
   sprite.body!.allowGravity = false;

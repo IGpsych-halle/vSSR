@@ -1,6 +1,6 @@
 import type {
   ItemStack,
-} from "../../items/itemState";
+} from "../../../../shared/items/itemState";
 
 
 export type InventoryState = {

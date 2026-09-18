@@ -28,8 +28,8 @@ app.use(
 );
 
 app.use(
-  "/api/character",
-  characterRouter
+  "/api/inventory",
+  inventoryRouter
 );
 
 app.get("/api/health", async (_req, res) => {
