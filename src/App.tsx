@@ -17,6 +17,7 @@ import {
 
 
 function App() {
+
   const [inventoryOpen, setInventoryOpen] =
     useState(false);
 

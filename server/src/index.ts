@@ -4,6 +4,11 @@ import {
   supabase,
 } from "./lib/supabase.js";
 
+import {
+  requireAuth,
+  type AuthenticatedRequest,
+} from "./middleware/requireAuth.js";
+
 const app = express();
 const PORT = 3000;
 
@@ -37,6 +42,23 @@ app.get("/api/health", async (_req, res) => {
     data,
   });
 });
+
+app.get(
+  "/api/me",
+  requireAuth,
+  (req, res) => {
+    const authenticatedReq =
+      req as AuthenticatedRequest;
+
+
+    return res.json({
+      user: {
+        id: authenticatedReq.user.id,
+        email: authenticatedReq.user.email,
+      },
+    });
+  }
+);
 
 app.listen(PORT, () => {
   console.log(`vSSR backend running on port ${PORT}`);
