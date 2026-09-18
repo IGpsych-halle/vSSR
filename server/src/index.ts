@@ -13,10 +13,19 @@ import {
   characterRouter,
 } from "./routes/character.js";
 
+import {
+  inventoryRouter,
+} from "./routes/inventory.js";
+
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
+
+app.use(
+  "/api/character",
+  characterRouter
+);
 
 app.use(
   "/api/character",
