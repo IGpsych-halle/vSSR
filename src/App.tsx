@@ -15,11 +15,20 @@ import {
   uiState,
 } from "./game/state/uiState";
 
+/* import {
+  useAuth,
+} from "./auth/useAuth";
+
+import {
+  apiFetch,
+} from "./api/apiClient";
+*/
 
 function App() {
 
   const [inventoryOpen, setInventoryOpen] =
     useState(false);
+
 
   useEffect(() => {
     const game =

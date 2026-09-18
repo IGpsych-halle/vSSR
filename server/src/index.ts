@@ -9,10 +9,19 @@ import {
   type AuthenticatedRequest,
 } from "./middleware/requireAuth.js";
 
+import {
+  characterRouter,
+} from "./routes/character.js";
+
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
+
+app.use(
+  "/api/character",
+  characterRouter
+);
 
 app.get("/api/health", async (_req, res) => {
   const {
